@@ -1,2 +1,8 @@
 capable-zuccutto-433785.netlify.app      ,,,,,,     
-glittery-mooncake-959ac1.netlify.app
+glittery-mooncake-959ac1.netlify.app     ,,,,,
+jolly-concha-0bd048.netlify.app          ,,,,,
+stirring-gumption-1194d8.netlify.app     ,,,,, 
+quiet-chebakia-443bb1.netlify.app        ,,,,,
+clinquant-chimera-f8be22.netlify.app     ,,,,,
+friendly-pony-17bc0a.netlify.app         ,,,,,
+taupe-piroshki-ee1d17.netlify.app        ,,,,,
