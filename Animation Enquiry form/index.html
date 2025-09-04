@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Animated Enquiry Form</title>
+  <style>
+    :root {
+      --bg-1: 255, 99, 132;
+      --bg-2: 54, 162, 235;
+      --bg-3: 255, 206, 86;
+      --card: 255,255,255;
+      --ink: 28,28,30;
+      --muted: 110,110,118;
+      --accent: 99,102,241;
+      --success: 16, 185, 129;
+      --danger: 239, 68, 68;
+      --shadow: 17, 24, 39;
+    }
+
+    /* Page reset */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: rgb(var(--ink));
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 10%, rgba(var(--bg-1),0.25), transparent 40%),
+                  radial-gradient(circle at 80% 20%, rgba(var(--bg-2),0.25), transparent 45%),
+                  radial-gradient(circle at 20% 80%, rgba(var(--bg-3),0.25), transparent 45%),
+                  linear-gradient(135deg, #0f172a 0%, #111827 50%, #0b1220 100%);
+      background-attachment: fixed;
+    }
+
+    /* Floating animated blobs */
+    .blob {
+      position: fixed; inset: 0; pointer-events: none; filter: blur(60px);
+      opacity: .55; z-index: 0;
+      animation: hue 16s linear infinite;
+    }
+    .blob::before, .blob::after {
+      content: ""; position: absolute; width: 45vmax; height: 45vmax; border-radius: 50%;
+    }
+    .blob::before { left: -10vmax; top: -10vmax; background: radial-gradient(circle, rgba(var(--bg-1),.5), rgba(var(--bg-2),.2)); animation: floatA 24s ease-in-out infinite; }
+    .blob::after  { right: -15vmax; bottom: -15vmax; background: radial-gradient(circle, rgba(var(--bg-2),.5), rgba(var(--bg-3),.2)); animation: floatB 28s ease-in-out infinite; }
+    @keyframes floatA { 0%,100%{transform: translate(0,0) scale(1);} 50%{transform: translate(5vmax, 3vmax) scale(1.15);} }
+    @keyframes floatB { 0%,100%{transform: translate(0,0) scale(1);} 50%{transform: translate(-6vmax, -4vmax) scale(1.1);} }
+    @keyframes hue { to { filter: hue-rotate(360deg) blur(60px);} }
+
+    /* Container */
+    .wrap {
+      min-height: 100%; display: grid; place-items: center; padding: 5vh 2rem; position: relative; z-index: 1;
+    }
+
+    /* Card */
+    .card {
+      width: min(960px, 96vw);
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.85));
+      border: 1px solid rgba(255,255,255,.5);
+      box-shadow: 0 20px 60px rgba(var(--shadow), .45), inset 0 1px 0 rgba(255,255,255,.6);
+      backdrop-filter: blur(16px) saturate(120%);
+      border-radius: 24px; overflow: hidden; position: relative;
+      animation: enter 700ms cubic-bezier(.2,.9,.2,1) both;
+    }
+    @keyframes enter { from { transform: translateY(14px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+    /* Header */
+    .hero {
+      position: relative; padding: clamp(24px, 6vw, 48px);
+      background: linear-gradient(135deg, rgba(var(--accent),.12), rgba(255,255,255,0));
+    }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(28px, 4.4vw, 40px); letter-spacing: -0.02em; }
+    .hero p { margin: 0; color: rgb(var(--muted)); font-size: clamp(14px, 2.2vw, 16px); }
+
+    /* Form grid */
+    form { padding: 24px clamp(16px, 4vw, 40px) 36px; display: grid; gap: 18px; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+    @media (max-width: 720px) { .col-6 { grid-column: span 12; } }
+
+    /* Floating label fields */
+    .field { position: relative; }
+    .input {
+      width: 100%; padding: 18px 16px 16px; border-radius: 14px;
+      border: 1.25px solid rgba(0,0,0,.08);
+      background: rgba(255,255,255,.85);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      outline: none; font-size: 16px; transition: box-shadow .25s, border-color .25s, transform .12s ease;
+    }
+    .input:hover { border-color: rgba(0,0,0,.16); }
+    .input:focus { border-color: rgba(var(--accent), .55); box-shadow: 0 0 0 4px rgba(var(--accent), .12), inset 0 1px 0 rgba(255,255,255,.8); }
+    .input:focus-visible { outline: none; }
+
+    .label { position: absolute; left: 12px; top: 12px; padding: 2px 6px; border-radius: 10px; font-size: 14px; color: rgb(120,120,126); pointer-events: none; transition: transform .2s ease, color .2s ease, background .2s ease; background: transparent; }
+
+    .input:focus + .label,
+    .input:not(:placeholder-shown) + .label,
+    select.input:has(option:checked:not([value=""])) + .label,
+    textarea.input:not(:placeholder-shown) + .label {
+      transform: translate(6px, -18px) scale(.92);
+      background: rgba(255,255,255,.9);
+      color: rgb(var(--accent));
+      box-shadow: 0 1px 0 rgba(0,0,0,.06);
+    }
+
+    textarea.input { min-height: 120px; resize: vertical; }
+
+    /* Helper text & errors */
+    .help { font-size: 12px; color: rgb(var(--muted)); margin-top: 6px; min-height: 16px; }
+    .error { color: rgb(var(--danger)); display: none; }
+    .field.invalid .input { border-color: rgba(var(--danger), .6); box-shadow: 0 0 0 4px rgba(var(--danger), .12); }
+    .field.invalid .error { display: block; animation: pop .18s ease-out both; }
+    @keyframes pop { from { transform: translateY(4px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Choices */
+    .choices { display: flex; gap: 12px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; cursor: pointer; user-select: none;
+      background: rgba(255,255,255,.9); border: 1px solid rgba(0,0,0,.08); transition: transform .06s, box-shadow .2s, border-color .2s; box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .chip input { appearance: none; width: 14px; height: 14px; border: 2px solid rgba(0,0,0,.4); border-radius: 50%; display: grid; place-items: center; }
+    .chip input:checked { border-color: rgb(var(--accent)); background: radial-gradient(circle, rgb(var(--accent)) 40%, transparent 41%); }
+    .chip:hover { transform: translateY(-1px); border-color: rgba(0,0,0,.2); }
+
+    /* Footer */
+    .form-footer { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-top: 4px; }
+    .agree { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgb(var(--muted)); }
+
+    /* Buttons */
+    .btn {
+      appearance: none; border: 0; cursor: pointer; border-radius: 14px; font-weight: 600; font-size: 15px; padding: 14px 18px; min-width: 140px;
+      background: linear-gradient(180deg, rgba(var(--accent), .95), rgba(var(--accent), .85)); color: white;
+      box-shadow: 0 10px 20px rgba(99,102,241,.35), inset 0 1px 0 rgba(255,255,255,.4);
+      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+      position: relative; overflow: hidden;
+    }
+    .btn:hover { box-shadow: 0 16px 32px rgba(99,102,241,.4); filter: brightness(1.02); }
+    .btn:active { transform: translateY(1px); }
+    .btn--ghost { background: rgba(255,255,255,.9); color: rgb(var(--ink)); border: 1px solid rgba(0,0,0,.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.7); }
+
+    /* Ripple effect */
+    .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple .6s linear; background: rgba(255,255,255,.6); }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* Toast */
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(40px);
+      background: rgba(17,24,39,.9); color: #fff; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      opacity: 0; pointer-events: none; transition: transform .3s ease, opacity .3s ease; z-index: 20;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Loading overlay */
+    .overlay { position: absolute; inset: 0; background: rgba(255,255,255,.7); display: grid; place-items: center; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+    .overlay.show { opacity: 1; pointer-events: all; }
+    .spinner { width: 54px; height: 54px; border-radius: 50%; border: 4px solid rgba(0,0,0,.12); border-top-color: rgb(var(--accent)); animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success screen */
+    .success { display: none; padding: 24px 32px 40px; text-align: center; }
+    .success.show { display: block; animation: pop .24s ease-out both; }
+    .success h2 { margin: 12px 0 6px; }
+    .success p { color: rgb(var(--muted)); margin: 0 0 18px; }
+
+    /* Tiny confetti */
+    .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .confetti i { position: absolute; width: 8px; height: 12px; background: currentColor; top: -12px; opacity: 0.9; border-radius: 2px; animation: fall 1.8s ease-out forwards; }
+    @keyframes fall { to { transform: translateY(120%) rotate(260deg); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="blob" aria-hidden="true"></div>
+  <div class="wrap">
+    <section class="card" role="region" aria-labelledby="title">
+      <div class="hero">
+        <h1 id="title">Enquiry Form</h1>
+        <p>Have a question or a project in mind? Send us the details and we'll get back within 24 hours.</p>
+      </div>
+
+      <form id="enquiryForm" novalidate>
+        <div class="grid">
+          <div class="field col-6">
+            <input class="input" id="name" name="name" type="text" placeholder=" " autocomplete="name" required />
+            <label class="label" for="name">Full name *</label>
+            <div class="help error">Please enter your name (min 2 characters).</div>
+          </div>
+
+          <div class="field col-6">
+            <input class="input" id="email" name="email" type="email" placeholder=" " autocomplete="email" required />
+            <label class="label" for="email">Email *</label>
+            <div class="help error">Enter a valid email address.</div>
+          </div>
+
+          <div class="field col-6">
+            <input class="input" id="phone" name="phone" type="tel" placeholder=" " autocomplete="tel" />
+            <label class="label" for="phone">Phone (optional)</label>
+            <div class="help">Add country code if outside India.</div>
+          </div>
+
+          <div class="field col-6">
+            <select class="input" id="topic" name="topic" required>
+              <option value="" selected disabled hidden></option>
+              <option>General Question</option>
+              <option>Website Development</option>
+              <option>Mobile App</option>
+              <option>UI/UX Design</option>
+              <option>Other</option>
+            </select>
+            <label class="label" for="topic">Subject *</label>
+            <div class="help error">Please choose a subject.</div>
+          </div>
+
+          <div class="field col-12">
+            <textarea class="input" id="message" name="message" placeholder=" " required minlength="10"></textarea>
+            <label class="label" for="message">Your message *</label>
+            <div class="help error">Tell us a bit more (min 10 characters).</div>
+          </div>
+
+          <div class="col-12">
+            <div class="choices" role="group" aria-label="Preferred contact">
+              <label class="chip"><input type="radio" name="contact" value="email" checked /> Email</label>
+              <label class="chip"><input type="radio" name="contact" value="phone" /> Phone</label>
+              <label class="chip"><input type="radio" name="contact" value="whatsapp" /> WhatsApp</label>
+            </div>
+          </div>
+
+          <div class="field col-12">
+            <input class="input" id="file" name="file" type="file" accept=".pdf,.doc,.docx,.png,.jpg" placeholder=" " />
+            <label class="label" for="file">Attach brief / screenshot (optional)</label>
+            <div class="help">Max 10MB. Accepted: PDF, DOC, PNG, JPG.</div>
+          </div>
+
+          <div class="form-footer col-12">
+            <label class="agree"><input id="agree" type="checkbox" /> I agree to the terms and privacy policy.</label>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="btn btn--ghost" id="resetBtn">Reset</button>
+              <button type="submit" class="btn" id="submitBtn">Send enquiry</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="overlay" id="overlay" aria-hidden="true"><div class="spinner" aria-label="Loading"></div></div>
+      </form>
+
+      <div class="success" id="success">
+        <div class="confetti" id="confetti" aria-hidden="true"></div>
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="rgb(var(--success))" stroke-width="2" fill="rgba(16,185,129,.1)"/>
+          <path d="M8 12.5l2.5 2.5L16.5 9" stroke="rgb(var(--success))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h2>Enquiry sent!</h2>
+        <p>Thank you for reaching out. We’ll respond soon. You can safely close this window.</p>
+        <button class="btn btn--ghost" id="sendAnother">Send another response</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const form = document.getElementById('enquiryForm');
+    const overlay = document.getElementById('overlay');
+    const toast = document.getElementById('toast');
+    const success = document.getElementById('success');
+    const resetBtn = document.getElementById('resetBtn');
+    const sendAnother = document.getElementById('sendAnother');
+
+    // Accessibility: programmatic label float for selects when an option is chosen via keyboard
+    document.querySelectorAll('select.input').forEach(sel => {
+      sel.addEventListener('change', () => sel.dispatchEvent(new Event('input', {bubbles:true})));
+    });
+
+    // Button ripple
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const d = Math.max(btn.clientWidth, btn.clientHeight);
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        r.style.width = r.style.height = d + 'px';
+        const rect = btn.getBoundingClientRect();
+        r.style.left = (e.clientX - rect.left - d/2) + 'px';
+        r.style.top  = (e.clientY - rect.top  - d/2) + 'px';
+        btn.appendChild(r);
+        setTimeout(() => r.remove(), 650);
+      });
+    });
+
+    // Simple validators
+    const validators = {
+      name: v => typeof v === 'string' && v.trim().length >= 2,
+      email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
+      message: v => typeof v === 'string' && v.trim().length >= 10,
+      topic: v => !!v,
+      agree: v => v === true,
+      file: file => !file || (file.size <= 10 * 1024 * 1024),
+    };
+
+    function showError(id, on) {
+      const field = document.getElementById(id).closest('.field');
+      if (!field) return;
+      field.classList.toggle('invalid', on);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+      showToast('Form reset');
+    });
+
+    sendAnother.addEventListener('click', () => {
+      success.classList.remove('show');
+      form.style.display = 'block';
+      form.reset();
+      showToast('You can submit a new response');
+    });
+
+    // Confetti generator (lightweight)
+    function burstConfetti(container, count = 40) {
+      container.innerHTML = '';
+      const colors = ['#22c55e', '#60a5fa', '#f59e0b', '#ef4444', '#a78bfa'];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('i');
+        el.style.left = Math.random()*100 + '%';
+        el.style.color = colors[Math.floor(Math.random()*colors.length)];
+        el.style.transform = `translateY(-10%) rotate(${Math.random()*180}deg)`;
+        el.style.animationDelay = (Math.random()*0.6)+'s';
+        el.style.animationDuration = (1.2 + Math.random()*1.2)+'s';
+        container.appendChild(el);
+      }
+    }
+
+    function validateForm() {
+      const data = new FormData(form);
+      const values = Object.fromEntries(data.entries());
+      const checks = {
+        name: validators.name(values.name),
+        email: validators.email(values.email),
+        message: validators.message(values.message),
+        topic: validators.topic(values.topic),
+        agree: validators.agree(document.getElementById('agree').checked),
+        file: validators.file(document.getElementById('file').files[0])
+      };
+
+      showError('name', !checks.name);
+      showError('email', !checks.email);
+      showError('message', !checks.message);
+      showError('topic', !checks.topic);
+      if (!checks.file) showToast('File too large (max 10MB)');
+
+      if (!checks.agree) {
+        document.querySelector('.agree').animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-6px)' },
+          { transform: 'translateX(6px)' },
+          { transform: 'translateX(0)' },
+        ], { duration: 300, easing: 'ease-in-out' });
+        showToast('Please agree to the terms');
+      }
+
+      return Object.values(checks).every(Boolean);
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateForm()) return;
+
+      overlay.classList.add('show');
+
+      // Simulate async submit
+      await new Promise(r => setTimeout(r, 1200));
+
+      overlay.classList.remove('show');
+      form.style.display = 'none';
+      success.classList.add('show');
+      burstConfetti(document.getElementById('confetti'));
+    });
+  </script>
+</body>
+</html>
