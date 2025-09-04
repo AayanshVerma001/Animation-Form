@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Futuristic Enquiry Form</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      width: 400px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 28px;
+    }
+
+    .inputBox {
+      position: relative;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .inputBox input,
+    .inputBox textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .inputBox input:focus,
+    .inputBox textarea:focus {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.02);
+    }
+
+    .inputBox span {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 14px;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+
+    .inputBox input:valid ~ span,
+    .inputBox input:focus ~ span,
+    .inputBox textarea:valid ~ span,
+    .inputBox textarea:focus ~ span {
+      top: -8px;
+      font-size: 12px;
+      color: #ffeb3b;
+    }
+
+    .btn {
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #ff6ec4, #7873f5);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: linear-gradient(45deg, #ff8a00, #e52e71);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .background-circles span {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      animation: move 10s linear infinite;
+    }
+
+    .background-circles span:nth-child(1) {
+      width: 150px; height: 150px;
+      left: -50px; top: -50px;
+    }
+
+    .background-circles span:nth-child(2) {
+      width: 100px; height: 100px;
+      right: -30px; bottom: -40px;
+      animation-duration: 12s;
+    }
+
+    .background-circles span:nth-child(3) {
+      width: 80px; height: 80px;
+      left: 40%; bottom: -30px;
+      animation-duration: 8s;
+    }
+
+    @keyframes move {
+      0% { transform: translateY(0) rotate(0); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+      100% { transform: translateY(0) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-circles">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="container">
+    <h2>Enquiry Form</h2>
+    <form>
+      <div class="inputBox">
+        <input type="text" required>
+        <span>Full Name</span>
+      </div>
+      <div class="inputBox">
+        <input type="email" required>
+        <span>Email Address</span>
+      </div>
+      <div class="inputBox">
+        <input type="tel">
+        <span>Phone Number</span>
+      </div>
+      <div class="inputBox">
+        <textarea required></textarea>
+        <span>Your Message</span>
+      </div>
+      <button type="submit" class="btn">Send Enquiry</button>
+    </form>
+  </div>
+</body>
+</html>
